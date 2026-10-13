@@ -1,0 +1,7 @@
+# OSが作るファイル
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 書き出した学習ログ（個人の記録なので公開しない）
+techtrain-log-*.json

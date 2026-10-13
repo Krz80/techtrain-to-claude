@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>TechTrain → Claude</title>
+<style>
+  :root {
+    --bg: #faf8f3; --card: #ffffff; --ink: #2b2a27; --sub: #77726a; --line: #ebe6dc;
+    --accent: #d97757; --accent-soft: #f6e3da;
+    --h0: #efebe3; --h1: #f3cdbb; --h2: #e9a585; --h3: #d97757; --h4: #a9502f;
+    --basic: #5b8def; --applied: #d9a03c; --quiz: #4caf7d;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1f1e1c; --card: #2a2926; --ink: #f1ede4; --sub: #a49e92; --line: #3a3834;
+      --accent-soft: #4a3329;
+      --h0: #34322e; --h1: #5c3a2c; --h2: #8f4f35; --h3: #c96a47; --h4: #f08e67;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; width: 370px; min-height: 480px; background: var(--bg); color: var(--ink);
+    font: 13px/1.5 "Hiragino Sans", "Yu Gothic UI", "Noto Sans JP", system-ui, sans-serif; }
+  header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 10px; }
+  .brand { font-weight: 700; font-size: 14px; letter-spacing: .02em; }
+  .brand span { color: var(--accent); }
+  .switch { display: flex; align-items: center; gap: 8px; color: var(--sub); font-size: 12px; cursor: pointer; user-select: none; }
+  .switch input { display: none; }
+  .track { width: 34px; height: 20px; border-radius: 10px; background: var(--line); position: relative; transition: .2s; }
+  .track::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: .2s; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+  .switch input:checked + .track { background: var(--accent); }
+  .switch input:checked + .track::after { left: 16px; }
+  nav { display: flex; gap: 4px; padding: 0 12px; border-bottom: 1px solid var(--line); }
+  nav button { flex: 1; background: none; border: 0; padding: 8px 0 9px; color: var(--sub); font: inherit; cursor: pointer; border-bottom: 2px solid transparent; }
+  nav button.on { color: var(--ink); font-weight: 700; border-bottom-color: var(--accent); }
+  main { padding: 14px 16px 18px; }
+  section[hidden] { display: none; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-bottom: 10px; }
+  .streak { display: flex; align-items: center; gap: 14px; }
+  .flame { font-size: 34px; line-height: 1; filter: grayscale(1) opacity(.45); }
+  .flame.lit { filter: none; }
+  .big { font-size: 34px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+  .big small { font-size: 14px; font-weight: 600; margin-left: 2px; }
+  .note { color: var(--sub); font-size: 12px; margin-top: 4px; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); text-align: center; }
+  .stats b { display: block; font-size: 17px; font-variant-numeric: tabular-nums; }
+  .stats span { color: var(--sub); font-size: 11px; }
+  .label { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; font-weight: 700; }
+  .label em { font-style: normal; font-weight: 400; color: var(--sub); font-size: 12px; }
+  .bar { height: 8px; background: var(--h0); border-radius: 4px; overflow: hidden; }
+  .bar i { display: block; height: 100%; background: var(--accent); border-radius: 4px; transition: width .4s; }
+  .heat { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 13px); gap: 3px; justify-content: start; }
+  .heat div { width: 13px; height: 13px; border-radius: 3px; background: var(--h0); }
+  .heat .l1 { background: var(--h1); } .heat .l2 { background: var(--h2); } .heat .l3 { background: var(--h3); } .heat .l4 { background: var(--h4); }
+  .heat .today { outline: 1.5px solid var(--ink); outline-offset: 1px; }
+  .legend { display: flex; align-items: center; justify-content: flex-end; gap: 3px; margin-top: 8px; color: var(--sub); font-size: 11px; }
+  .legend i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  .kinds .row { display: grid; grid-template-columns: 54px 1fr 28px; align-items: center; gap: 8px; margin: 6px 0; }
+  .kinds .row b { text-align: right; font-variant-numeric: tabular-nums; }
+  .chip { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; color: #fff; white-space: nowrap; }
+  .chip.basic { background: var(--basic); } .chip.applied { background: var(--applied); } .chip.quiz { background: var(--quiz); }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { background: var(--accent-soft); border-radius: 6px; padding: 3px 8px; font-size: 12px; }
+  .tag b { margin-left: 4px; color: var(--accent); }
+  .empty { text-align: center; color: var(--sub); padding: 28px 8px; }
+  .search { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--ink); font: inherit; margin-bottom: 10px; }
+  .day { color: var(--sub); font-size: 12px; font-weight: 700; margin: 12px 0 6px; }
+  .item { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 6px; }
+  .item .top { display: flex; gap: 8px; align-items: flex-start; }
+  .item .topic { font-weight: 700; flex: 1; word-break: break-word; }
+  .item .meta { color: var(--sub); font-size: 12px; margin-top: 3px; }
+  .item .acts { display: flex; gap: 6px; margin-top: 8px; }
+  .btn { background: var(--card); border: 1px solid var(--line); color: var(--ink); border-radius: 7px; padding: 5px 10px; font: inherit; font-size: 12px; cursor: pointer; }
+  .btn:hover { border-color: var(--accent); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.danger { color: #c0392b; }
+  .field { margin-bottom: 14px; }
+  .field > p { margin: 0 0 6px; font-weight: 700; }
+  .field label.opt { display: flex; gap: 8px; align-items: flex-start; margin: 6px 0; cursor: pointer; }
+  .field label.opt span { color: var(--sub); font-size: 12px; display: block; }
+  .field input[type=text], .field input[type=number] { width: 100%; padding: 7px 9px; border: 1px solid var(--line); border-radius: 7px; background: var(--card); color: var(--ink); font: inherit; }
+  .field input[type=number] { width: 80px; }
+  .hint { color: var(--sub); font-size: 12px; margin-top: 4px; }
+  .pending { border-color: var(--accent); background: var(--accent-soft); }
+  .pending .p-item { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-top: 1px solid var(--line); }
+  .pending .p-item:first-of-type { border-top: 0; }
+  .pending .p-title { flex: 1; font-weight: 700; font-size: 12.5px; word-break: break-word; }
+  .pending .p-title small { display: block; font-weight: 400; color: var(--sub); }
+  .memo { margin-top: 6px; padding: 6px 9px; background: var(--bg); border-radius: 7px; font-size: 12.5px; white-space: pre-wrap; word-break: break-word; }
+  .wait { color: var(--accent); font-weight: 700; font-size: 11.5px; }
+  .err { color: #c0392b !important; }
+  .saved { color: var(--quiz); font-size: 12px; height: 16px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">TechTrain <span>→</span> Claude</div>
+  <label class="switch" title="ONのときChatGPTの代わりにClaudeで開きます">
+    <span id="swLabel">ON</span>
+    <input type="checkbox" id="enabled"><span class="track"></span>
+  </label>
+</header>
+<nav>
+  <button data-tab="stats" class="on">記録</button>
+  <button data-tab="history">履歴</button>
+  <button data-tab="settings">設定</button>
+</nav>
+<main>
+  <section id="stats">
+    <div class="card pending" id="pendingCard" hidden>
+      <div class="label">振り返り待ち <em>振り返ると記録に入ります</em></div>
+      <div id="pendingList"></div>
+    </div>
+    <div class="card">
+      <div class="streak">
+        <div class="flame" id="flame">🔥</div>
+        <div>
+          <div class="big"><span id="streak">0</span><small>日連続</small></div>
+          <div class="note" id="streakNote"></div>
+        </div>
+      </div>
+      <div class="stats">
+        <div><b id="today">0</b><span>今日</span></div>
+        <div><b id="total">0</b><span>これまで</span></div>
+        <div><b id="best">0</b><span>最長連続</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="label">今週の目標 <em id="goalText"></em></div>
+      <div class="bar"><i id="goalBar" style="width:0"></i></div>
+    </div>
+    <div class="card">
+      <div class="label">学習カレンダー <em>直近17週</em></div>
+      <div class="heat" id="heat"></div>
+      <div class="legend">少<i style="background:var(--h0)"></i><i style="background:var(--h1)"></i><i style="background:var(--h2)"></i><i style="background:var(--h3)"></i><i style="background:var(--h4)"></i>多</div>
+    </div>
+    <div class="card kinds">
+      <div class="label">ステップ別</div>
+      <div id="kinds"></div>
+    </div>
+    <div class="card">
+      <div class="label">よく学んだ技術</div>
+      <div class="tags" id="techs"></div>
+    </div>
+  </section>
+
+  <section id="history" hidden>
+    <input class="search" id="q" placeholder="トピックや技術で絞り込み">
+    <div id="list"></div>
+  </section>
+
+  <section id="settings" hidden>
+    <div class="field">
+      <p>使うClaude</p>
+      <label class="opt"><input type="radio" name="client" value="app"><div>デスクトップアプリ</div></label>
+      <label class="opt"><input type="radio" name="client" value="web"><div>ブラウザ</div></label>
+    </div>
+    <div class="field">
+      <p>開く場所</p>
+      <label class="opt"><input type="radio" name="dest" value="new"><div>毎回新しいチャット<span>プロンプトが入力された状態で開きます</span></div></label>
+      <label class="opt"><input type="radio" name="dest" value="fixed"><div>いつものチャット・プロジェクト<span>TechTrain用に決めたチャットかプロジェクトで開きます</span></div></label>
+      <div id="targetBox">
+        <input type="text" id="targetUrl" placeholder="https://claude.ai/chat/... または https://claude.ai/project/...">
+        <div class="hint" id="targetHint"></div>
+      </div>
+    </div>
+    <div class="field" id="autoSendField">
+      <label class="opt"><input type="checkbox" id="autoSend"><div>開いたら自動で送信する<span>ブラウザのときだけ使えます。オフなら入力された状態で止まります</span></div></label>
+    </div>
+    <div class="field">
+      <p>今週の目標（回）</p>
+      <input type="number" id="weeklyGoal" min="1" max="99">
+    </div>
+    <div class="saved" id="saved"></div>
+    <div class="field">
+      <p>データ</p>
+      <button class="btn" id="export">記録を書き出す（JSON）</button>
+      <button class="btn danger" id="clear">記録をすべて消す</button>
+    </div>
+  </section>
+</main>
+<script src="lib.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>
