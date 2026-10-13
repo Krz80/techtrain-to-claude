@@ -6,8 +6,7 @@ TechTrainの学習ページにある「プロンプトを生成」ボタンを�
 > TechTrain・Claude・ChatGPTの公式ツールではありません。個人で作った非公式の拡張機能です。
 > 公開にあたっては、TechTrain運営の方に確認し、了承をいただいています。
 
-![学習ログ画面](docs/popup.png)
-![学習ページ](docs/study.png)
+<img src="docs/popup.png" alt="学習ログ画面" height="420"> <img src="docs/study.png" alt="学習ページ" height="420">
 
 ## 作った理由
 
